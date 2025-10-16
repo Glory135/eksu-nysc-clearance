@@ -53,7 +53,12 @@ export async function middleware(req: NextRequest) {
       if (userRole === "super_admin" && pathname.startsWith("/admin")) {
         return NextResponse.next()
       }
-      const redirectPath = userRole === "student" ? "/student/dashboard" : userRole === "super_admin" ? "/admin/dashboard" : `/${userRole}/dashboard`
+      const redirectPath =
+        userRole === "student" ? "/student/dashboard"
+          : userRole === "super_admin" ? "/admin/dashboard"
+            : userRole === "admissions_officer" ? "/admissions/dashboard"
+              : userRole === "hod" ? "/hod/dashboard"
+                : `/${userRole}/dashboard`
       return NextResponse.redirect(new URL(redirectPath, req.url))
     }
   }

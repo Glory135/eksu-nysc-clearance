@@ -8,7 +8,7 @@ export default function AdmissionsDashboardPage() {
     <div className="container mx-auto py-8 px-5 max-w-7xl">
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-balance">Admissions Dashboard</h1>
+          <h1 className="text-3xl font-bold text-balance">Admissions Officer Dashboard</h1>
           <p className="text-muted-foreground text-balance mt-2">
             Provide final approval for NYSC clearance submissions across all departments
           </p>

@@ -38,7 +38,7 @@ const UserSchema = new Schema<IUser>(
       enum: ["student", "hod", "admissions_officer", "super_admin"],
       default: "student",
     },
-    department: { type: Schema.Types.ObjectId, ref: "Department", required: function() { return this.role !== 'super_admin' || this.role !== 'admissions_officer'; } },
+    department: { type: Schema.Types.ObjectId, ref: "Department", required: function () { return this.role !== 'super_admin' && this.role !== 'admissions_officer'; } },
     accountStatus: {
       type: String,
       enum: ["invited", "pending", "active", "suspended", "inactive"],

@@ -2,26 +2,34 @@
 
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
+import { useEffect } from "react"
 
-export default async function HomePage() {
-  const { data: session } = useSession()
+export default function HomePage() {
+  const { data: session, status } = useSession()
   const router = useRouter()
 
-  if (!session) {
-    router.push("/login")
-  }
+  useEffect(() => {
+    if (status === "loading") return
 
-  const role = session?.user.role
+    if (!session) {
+      router.replace("/login")
+      return
+    }
 
-  if (role === "student") {
-    router.push("/student/dashboard")
-  } else if (role === "hod") {
-    router.push("/hod/dashboard")
-  } else if (role === "admissions_officer") {
-    router.push("/admissions/dashboard")
-  } else if (role === "super_admin") {
-    router.push("/admin/dashboard")
-  }
+    const role = session.user.role
 
-  router.push("/login")
+    if (role === "student") {
+      router.replace("/student/dashboard")
+    } else if (role === "hod") {
+      router.replace("/hod/dashboard")
+    } else if (role === "admissions_officer") {
+      router.replace("/admissions/dashboard")
+    } else if (role === "super_admin") {
+      router.replace("/admin/dashboard")
+    } else {
+      router.replace("/login")
+    }
+  }, [session, status, router])
+
+  return null
 }
