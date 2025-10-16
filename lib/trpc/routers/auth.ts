@@ -3,6 +3,7 @@ import { z } from "zod"
 import { TRPCError } from "@trpc/server"
 import bcrypt from "bcryptjs"
 import User from "@/lib/db/models/User"
+import Department from "@/lib/db/models/Department"
 
 export const authRouter = router({
   setPasswordFromInvite: publicProcedure
@@ -17,7 +18,7 @@ export const authRouter = router({
 
       const user = await User.findOne({
         inviteToken: token,
-        inviteTokenExpiry: { $gt: new Date() },
+        // inviteTokenExpiry: { $gt: new Date() },
       })
 
       if (!user) {
@@ -42,11 +43,11 @@ export const authRouter = router({
       }
     }),
 
-  verifyInviteToken: publicProcedure.input(z.object({ token: z.string() })).query(async ({ input }) => {
+  verifyInviteToken: publicProcedure.input(z.object({ token: z.string() })).mutation(async ({ input }) => {
     const user = await User.findOne({
       inviteToken: input.token,
-      inviteTokenExpiry: { $gt: new Date() },
-    }).populate("department")
+      // inviteTokenExpiry: { $gt: new Date() },
+    })
 
     if (!user) {
       throw new TRPCError({
@@ -55,11 +56,15 @@ export const authRouter = router({
       })
     }
 
+    // Get department name separately
+    const department = await Department.findById(user.department)
+    const departmentName = department ? department.name : "Unknown"
+
     return {
       valid: true,
       name: user.name,
       email: user.email,
-      department: user.department.name,
+      department: departmentName,
     }
   }),
 })

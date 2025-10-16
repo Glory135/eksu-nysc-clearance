@@ -9,6 +9,7 @@ import UploadAudit from "@/lib/db/models/UploadAudit" // Added import for Upload
 import crypto from "crypto"
 import bcrypt from "bcryptjs"
 import { sendEmail } from "@/lib/email/resend"
+import mongoose from "mongoose"
 
 function generateAdmissionCode(): string {
   const prefix = "EKSU-AO"
@@ -215,7 +216,7 @@ export const adminRouter = router({
       })
 
       // Update department with HOD
-      department.hodUserId = hod._id
+      department.hodUserId = hod._id as mongoose.Types.ObjectId
       await department.save()
 
       // Send invite email

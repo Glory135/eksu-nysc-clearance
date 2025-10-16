@@ -17,8 +17,7 @@ const DepartmentSchema = new Schema<IDepartment>(
   { timestamps: true },
 )
 
-DepartmentSchema.index({ name: 1 })
-DepartmentSchema.index({ code: 1 })
+// Indexes for name and code are automatically created by unique: true
 
 const Department: Model<IDepartment> =
   mongoose.models.Department || mongoose.model<IDepartment>("Department", DepartmentSchema)

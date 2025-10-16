@@ -56,7 +56,7 @@ const NYSCFormSchema = new Schema<INYSCForm>(
   { timestamps: true },
 )
 
-NYSCFormSchema.index({ studentId: 1 })
+// Index for studentId is automatically created by unique: true
 NYSCFormSchema.index({ status: 1 })
 NYSCFormSchema.index({ clearanceId: 1 })
 

@@ -1,24 +1,27 @@
-import { redirect } from "next/navigation"
-import { auth } from "@/auth"
+"use client"
+
+import { useSession } from "next-auth/react"
+import { useRouter } from "next/navigation"
 
 export default async function HomePage() {
-  const session = await auth()
+  const { data: session } = useSession()
+  const router = useRouter()
 
   if (!session) {
-    redirect("/login")
+    router.push("/login")
   }
 
-  const role = session.user.role
+  const role = session?.user.role
 
   if (role === "student") {
-    redirect("/student/dashboard")
+    router.push("/student/dashboard")
   } else if (role === "hod") {
-    redirect("/hod/dashboard")
+    router.push("/hod/dashboard")
   } else if (role === "admissions_officer") {
-    redirect("/admissions/dashboard")
+    router.push("/admissions/dashboard")
   } else if (role === "super_admin") {
-    redirect("/admin/dashboard")
+    router.push("/admin/dashboard")
   }
 
-  redirect("/login")
+  router.push("/login")
 }

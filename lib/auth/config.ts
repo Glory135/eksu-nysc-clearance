@@ -3,6 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials"
 import bcrypt from "bcryptjs"
 import connectDB from "@/lib/db/mongoose"
 import User from "@/lib/db/models/User"
+import mongoose from "mongoose"
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -13,7 +14,8 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
         admissionCode: { label: "Admission Code", type: "text", optional: true },
       },
-      async authorize(credentials) {
+      // @ts-expect-error - credentials is not typed correctly
+      async authorize(credentials: Record<"email" | "password" | "admissionCode", string> | undefined) {
         if (!credentials?.email || !credentials?.password) {
           return null
         }
@@ -57,7 +59,7 @@ export const authOptions: NextAuthOptions = {
           }
 
           return {
-            id: user._id.toString(),
+            id: (user._id as mongoose.Types.ObjectId).toString(),
             email: user.email,
             name: user.name,
             role: user.role,

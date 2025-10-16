@@ -15,7 +15,7 @@ export async function sendInviteEmail({ to, name, token, hodName, departmentName
 
   try {
     await resend.emails.send({
-      from: "EKSU NYSC Clearance <noreply@eksu.edu.ng>",
+      from: process.env.EMAIL_FROM || "EKSU NYSC Clearance <noreply@eksu.edu.ng>",
       to,
       subject: "EKSU NYSC Clearance - Account Invitation",
       html: `
@@ -49,7 +49,7 @@ interface SubmissionConfirmationProps {
 export async function sendSubmissionConfirmation({ to, name, submissionId }: SubmissionConfirmationProps) {
   try {
     await resend.emails.send({
-      from: "EKSU NYSC Clearance <noreply@eksu.edu.ng>",
+      from: process.env.EMAIL_FROM || "EKSU NYSC Clearance <noreply@eksu.edu.ng>",
       to,
       subject: "EKSU NYSC Clearance - Submission Received",
       html: `
@@ -82,7 +82,7 @@ interface HODDecisionEmailProps {
 export async function sendHODDecisionEmail({ to, name, approved, remarks, hodName }: HODDecisionEmailProps) {
   try {
     await resend.emails.send({
-      from: "EKSU NYSC Clearance <noreply@eksu.edu.ng>",
+      from: process.env.EMAIL_FROM || "EKSU NYSC Clearance <noreply@eksu.edu.ng>",
       to,
       subject: `EKSU NYSC Clearance - Submission ${approved ? "Approved" : "Rejected"} by HOD`,
       html: `
@@ -97,21 +97,19 @@ export async function sendHODDecisionEmail({ to, name, approved, remarks, hodNam
               Status: ${approved ? "APPROVED" : "REJECTED"}
             </p>
           </div>
-          ${
-            approved
-              ? "<p>Your submission has been approved by your HOD and is now awaiting final approval from the Admissions Office.</p>"
-              : "<p>Your submission has been rejected. Please review the remarks below and resubmit if necessary.</p>"
-          }
-          ${
-            remarks
-              ? `
+          ${approved
+          ? "<p>Your submission has been approved by your HOD and is now awaiting final approval from the Admissions Office.</p>"
+          : "<p>Your submission has been rejected. Please review the remarks below and resubmit if necessary.</p>"
+        }
+          ${remarks
+          ? `
             <div style="background-color: #f9fafb; padding: 15px; border-radius: 5px; margin: 20px 0;">
               <p style="margin: 0 0 10px 0; font-weight: bold;">Remarks:</p>
               <p style="margin: 0;">${remarks}</p>
             </div>
           `
-              : ""
-          }
+          : ""
+        }
           <p>You can log in to your dashboard to view more details.</p>
           <div style="text-align: center; margin: 30px 0;">
             <a href="${process.env.NEXT_PUBLIC_APP_URL}/student/dashboard" style="background-color: #006400; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">View Dashboard</a>
@@ -141,7 +139,7 @@ export async function sendAdmissionsFinalDecisionEmail({
 }: AdmissionsFinalDecisionEmailProps) {
   try {
     await resend.emails.send({
-      from: "EKSU NYSC Clearance <noreply@eksu.edu.ng>",
+      from: process.env.EMAIL_FROM || "EKSU NYSC Clearance <noreply@eksu.edu.ng>",
       to,
       subject: `EKSU NYSC Clearance - ${approved ? "CLEARED" : "Final Rejection"}`,
       html: `
@@ -156,21 +154,19 @@ export async function sendAdmissionsFinalDecisionEmail({
               ${approved ? "✓ CLEARED FOR NYSC MOBILIZATION" : "✗ REJECTED"}
             </p>
           </div>
-          ${
-            approved
-              ? "<p>Your NYSC clearance has been approved. You are now cleared for NYSC mobilization.</p><p>Please proceed to collect your clearance certificate from the Admissions Office.</p>"
-              : "<p>Your submission has been rejected by the Admissions Office. Please review the remarks below.</p>"
-          }
-          ${
-            remarks
-              ? `
+          ${approved
+          ? "<p>Your NYSC clearance has been approved. You are now cleared for NYSC mobilization.</p><p>Please proceed to collect your clearance certificate from the Admissions Office.</p>"
+          : "<p>Your submission has been rejected by the Admissions Office. Please review the remarks below.</p>"
+        }
+          ${remarks
+          ? `
             <div style="background-color: #f9fafb; padding: 15px; border-radius: 5px; margin: 20px 0;">
               <p style="margin: 0 0 10px 0; font-weight: bold;">Remarks:</p>
               <p style="margin: 0;">${remarks}</p>
             </div>
           `
-              : ""
-          }
+          : ""
+        }
           <div style="text-align: center; margin: 30px 0;">
             <a href="${process.env.NEXT_PUBLIC_APP_URL}/student/dashboard" style="background-color: #006400; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">View Dashboard</a>
           </div>
@@ -194,7 +190,7 @@ interface ClearanceReadyEmailProps {
 export async function sendClearanceReadyEmail({ to, name, clearanceId, clearanceUrl }: ClearanceReadyEmailProps) {
   try {
     await resend.emails.send({
-      from: "EKSU NYSC Clearance <noreply@eksu.edu.ng>",
+      from: process.env.EMAIL_FROM || "EKSU NYSC Clearance <noreply@eksu.edu.ng>",
       to,
       subject: "Your EKSU NYSC Clearance Form Is Ready",
       html: `

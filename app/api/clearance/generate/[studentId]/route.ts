@@ -1,14 +1,14 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
-import { authConfig } from "@/lib/auth/config"
+import { authOptions } from "@/lib/auth/config"
 import { connectDB } from "@/lib/db/mongoose"
 import NYSCForm from "@/lib/db/models/NYSCForm"
 import User from "@/lib/db/models/User"
 import { generateClearancePDF } from "@/lib/pdf/generate-clearance"
 
-export async function POST(request: NextRequest, { params }: { params: { studentId: string } }) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ studentId: string }> }) {
   try {
-    const session = await getServerSession(authConfig)
+    const session = await getServerSession(authOptions)
 
     if (!session?.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest, { params }: { params: { student
 
     await connectDB()
 
-    const { studentId } = params
+    const { studentId } = await params
 
     // Find the approved form
     const form = await NYSCForm.findOne({
@@ -110,9 +110,9 @@ export async function POST(request: NextRequest, { params }: { params: { student
   }
 }
 
-export async function GET(request: NextRequest, { params }: { params: { studentId: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ studentId: string }> }) {
   try {
-    const session = await getServerSession(authConfig)
+    const session = await getServerSession(authOptions)
 
     if (!session?.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -120,7 +120,7 @@ export async function GET(request: NextRequest, { params }: { params: { studentI
 
     await connectDB()
 
-    const { studentId } = params
+    const { studentId } = await params
 
     // Check permissions
     if (session.user.role === "student" && session.user.id !== studentId) {

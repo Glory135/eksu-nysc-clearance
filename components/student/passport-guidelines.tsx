@@ -1,6 +1,7 @@
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Card, CardContent } from "@/components/ui/card"
 import { CheckCircle2 } from "lucide-react"
+import Image from "next/image"
 
 export function PassportGuidelines() {
   return (
@@ -53,8 +54,8 @@ export function PassportGuidelines() {
 
           <div className="space-y-3">
             <p className="font-medium text-sm">Example of Acceptable Photo:</p>
-            <div className="border-2 border-dashed border-border rounded-lg p-4 bg-background">
-              <img src="/passport-example.jpg" alt="Example passport photo" className="w-full h-auto rounded" />
+            <div className="relative w-full aspect-square border-2 border-dashed border-border rounded-lg p-4 bg-background">
+              <Image fill src="/professional-passport-photo-white-background-forma.jpg" alt="Example passport photo" className="w-full h-auto rounded" />
             </div>
             <p className="text-xs text-muted-foreground">
               Professional passport-style photo with white background and formal attire

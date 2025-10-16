@@ -4,9 +4,10 @@ import { GeistSans } from "geist/font/sans"
 import { GeistMono } from "geist/font/mono"
 import { Analytics } from "@vercel/analytics/next"
 import { Toaster } from "sonner"
-import { TRPCProvider } from "@/lib/trpc/provider"
 import { Suspense } from "react"
 import "./globals.css"
+import { Providers } from "./Providers"
+import { LoaderIcon } from "lucide-react"
 
 export const metadata: Metadata = {
   title: "EKSU NYSC Clearance System",
@@ -22,13 +23,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable}`}>
-        <TRPCProvider>
-          <Suspense fallback={null}>
+        <Providers>
+          <Suspense fallback={
+            <div className="w-screen bg-background h-screen flex justify-center items-center"><LoaderIcon /></div>
+          }>
             {children}
             <Toaster position="top-right" />
           </Suspense>
-        </TRPCProvider>
-        <Analytics />
+        </Providers>
+        {/* <Analytics /> */}
       </body>
     </html>
   )

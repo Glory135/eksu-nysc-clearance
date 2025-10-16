@@ -1,27 +1,63 @@
+"use client"
+
 import { RegisterForm } from "@/components/auth/register-form"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { XCircle } from "lucide-react"
+import { XCircle, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { appRouter } from "@/lib/trpc/routers/_app"
-import { createTRPCContext } from "@/lib/trpc/server"
+import { trpc } from "@/lib/trpc/client"
+import { useEffect, use } from "react"
+import { toast } from "sonner"
 
-async function verifyToken(token: string) {
-  try {
-    const ctx = await createTRPCContext()
-    const caller = appRouter.createCaller(ctx)
-    const data = await caller.auth.verifyInviteToken({ token })
-    return data
-  } catch (error) {
-    return null
+export default function RegisterPage({ params }: { params: Promise<{ token: string }> }) {
+  const verifyTokenMutation = trpc.auth.verifyInviteToken.useMutation({
+    onError: (error) => {
+      toast.error(error.message || "Failed to verify invitation token")
+    },
+  })
+
+  const resolvedParams = use(params)
+
+  useEffect(() => {
+    if (resolvedParams.token) {
+      verifyTokenMutation.mutate({ token: resolvedParams.token })
+    }
+  }, [resolvedParams.token])
+
+  // Loading state
+  if (verifyTokenMutation.isPending) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-accent/5 p-4">
+        <div className="w-full max-w-md space-y-6">
+          <div className="text-center space-y-2">
+            <div className="flex justify-center mb-4">
+              <div className="w-20 h-20 bg-primary rounded-full flex items-center justify-center">
+                <span className="text-3xl font-bold text-primary-foreground">EKSU</span>
+              </div>
+            </div>
+            <h1 className="text-3xl font-bold text-balance">NYSC Clearance System</h1>
+            <p className="text-muted-foreground text-balance">Ekiti State University, Ado-Ekiti</p>
+          </div>
+
+          <Card className="w-full max-w-md">
+            <CardHeader>
+              <div className="flex items-center gap-2 justify-center">
+                <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                <CardTitle>Verifying invitation...</CardTitle>
+              </div>
+              <CardDescription className="text-center">
+                Please wait while we verify your invitation link.
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        </div>
+      </div>
+    )
   }
-}
 
-export default async function RegisterPage({ params }: { params: { token: string } }) {
-  const userData = await verifyToken(params.token)
-
-  if (!userData) {
+  // Error state - invalid or expired token
+  if (verifyTokenMutation.isError || (verifyTokenMutation.isSuccess && !verifyTokenMutation.data)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-accent/5 p-4">
         <div className="w-full max-w-md space-y-6">
@@ -65,20 +101,26 @@ export default async function RegisterPage({ params }: { params: { token: string
     )
   }
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-accent/5 p-4">
-      <div className="w-full max-w-md space-y-6">
-        <div className="text-center space-y-2">
-          <div className="flex justify-center mb-4">
-            <div className="w-20 h-20 bg-primary rounded-full flex items-center justify-center">
-              <span className="text-3xl font-bold text-primary-foreground">EKSU</span>
+  // Success state - show registration form
+  if (verifyTokenMutation.isSuccess && verifyTokenMutation.data) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-accent/5 p-4">
+        <div className="w-full max-w-md space-y-6">
+          <div className="text-center space-y-2">
+            <div className="flex justify-center mb-4">
+              <div className="w-20 h-20 bg-primary rounded-full flex items-center justify-center">
+                <span className="text-3xl font-bold text-primary-foreground">EKSU</span>
+              </div>
             </div>
+            <h1 className="text-3xl font-bold text-balance">NYSC Clearance System</h1>
+            <p className="text-muted-foreground text-balance">Ekiti State University, Ado-Ekiti</p>
           </div>
-          <h1 className="text-3xl font-bold text-balance">NYSC Clearance System</h1>
-          <p className="text-muted-foreground text-balance">Ekiti State University, Ado-Ekiti</p>
+          <RegisterForm token={resolvedParams.token} userData={verifyTokenMutation.data} />
         </div>
-        <RegisterForm token={params.token} userData={userData} />
       </div>
-    </div>
-  )
+    )
+  }
+
+  // Fallback - should not reach here
+  return null
 }
