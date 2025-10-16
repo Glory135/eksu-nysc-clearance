@@ -1,9 +1,10 @@
-import { auth } from "@/auth"
+import { authOptions } from "@/lib/auth/config"
 import { put } from "@vercel/blob"
+import { getServerSession } from "next-auth"
 import { NextResponse } from "next/server"
 
 export async function POST(request: Request) {
-  const session = await auth()
+  const session = await getServerSession(authOptions)
 
   if (!session || session.user.role !== "student") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })

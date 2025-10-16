@@ -75,33 +75,42 @@ export const admissionsRouter = router({
             const randomId = Math.random().toString(36).substring(2, 8).toUpperCase()
             const clearanceId = `EKSU-NYSC-${year}-${randomId}`
 
+            // Prefer structured form data when available (manual submissions)
+            const manual = (form as any).submissionType === "manual" && (form as any).formData
+
+            const studentData = {
+              name: manual ? (form as any).formData.name : fullStudent?.name || student.name,
+              email: manual ? (form as any).formData.email : fullStudent?.email || student.email,
+              matricNumber: manual ? (form as any).formData.matricNumber : fullStudent?.matricNumber || student.matricNumber,
+              phone: manual ? (form as any).formData.phone : fullStudent?.phone,
+              sex: manual ? (form as any).formData.sex : fullStudent?.sex,
+              dateOfBirth: manual
+                ? (form as any).formData.dateOfBirth?.toISOString?.() || (form as any).formData.dateOfBirth
+                : fullStudent?.dateOfBirth,
+              maritalStatus: manual ? (form as any).formData.maritalStatus : fullStudent?.maritalStatus,
+              stateOfOrigin: manual ? (form as any).formData.stateOfOrigin : fullStudent?.stateOfOrigin,
+              lga: manual ? (form as any).formData.lga : fullStudent?.lga,
+              graduationDate: manual
+                ? (form as any).formData.graduationDate?.toISOString?.() || (form as any).formData.graduationDate
+                : fullStudent?.graduationDate,
+              courseOfStudy: manual ? (form as any).formData.courseOfStudy : fullStudent?.courseOfStudy,
+            }
+
             // Generate PDF
             const pdfUrl = await generateClearancePDF({
               clearanceId,
-              student: {
-                name: fullStudent?.name || student.name,
-                email: fullStudent?.email || student.email,
-                matricNumber: fullStudent?.matricNumber || student.matricNumber,
-                phone: fullStudent?.phone,
-                sex: fullStudent?.sex,
-                dateOfBirth: fullStudent?.dateOfBirth,
-                maritalStatus: fullStudent?.maritalStatus,
-                stateOfOrigin: fullStudent?.stateOfOrigin,
-                lga: fullStudent?.lga,
-                graduationDate: fullStudent?.graduationDate,
-                courseOfStudy: fullStudent?.courseOfStudy,
-              },
+              student: studentData,
               department: {
                 name: department?.name || "N/A",
                 faculty: department?.faculty,
               },
               passportUrl: form.passportUrl,
               hod: {
-                name: hodUser?.name || "HOD",
+                name: hodUser?.name as string,
                 approvedAt: hodApproval?.at.toISOString() || new Date().toISOString(),
               },
               admissions: {
-                name: ctx.user.name,
+                name: ctx.user.name as string,
                 approvedAt: new Date().toISOString(),
               },
             })

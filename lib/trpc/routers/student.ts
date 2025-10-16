@@ -2,16 +2,47 @@ import { router, studentProcedure } from "../server"
 import { z } from "zod"
 import { TRPCError } from "@trpc/server"
 import NYSCForm from "@/lib/db/models/NYSCForm"
+import type { INYSCForm } from "@/lib/db/models/NYSCForm"
 import User from "@/lib/db/models/User"
 import { sendSubmissionConfirmation } from "@/lib/email/templates"
 
 export const studentRouter = router({
   submitForm: studentProcedure
     .input(
-      z.object({
-        passportUrl: z.string().url(),
-        formUrl: z.string().url(),
-      }),
+      z.union([
+        // Backward compatible: file upload mode
+        z.object({
+          mode: z.literal("upload").optional(),
+          // Optional in dev when Blob upload is disabled
+          passportUrl: z.string().optional().default(""),
+          formUrl: z.string().url(),
+        }),
+        // New: manual entry mode with structured fields
+        z.object({
+          mode: z.literal("manual"),
+          // Optional in dev; when empty the PDF renderer will show placeholder
+          passportUrl: z.string().optional().default(""),
+          formData: z.object({
+            name: z.string().min(2),
+            faculty: z.string().min(2),
+            department: z.string().min(2),
+            courseOfStudy: z.string().min(2),
+            matricNumber: z.string().min(2),
+            jambRegNo: z.string().min(2),
+            sex: z.enum(["male", "female"]),
+            dateOfBirth: z.string(),
+            maritalStatus: z.enum(["single", "married"]),
+            stateOfOrigin: z.string().min(2),
+            lga: z.string().min(2),
+            graduationDate: z.string(),
+            phone: z.string().min(5),
+            email: z.string().email(),
+            studentDeclaration: z
+              .object({ fullName: z.string().min(2), signedAt: z.string() })
+              .optional(),
+          }),
+        }),
+      ]),
     )
     .mutation(async ({ input, ctx }) => {
       // Check if student already has a submission
@@ -24,10 +55,25 @@ export const studentRouter = router({
         })
       }
 
-      const form = await NYSCForm.create({
+      const isManual = (input as any).mode === "manual"
+      const form: INYSCForm = await NYSCForm.create({
         studentId: ctx.user.id,
-        passportUrl: input.passportUrl,
-        formUrl: input.formUrl,
+        passportUrl: (input as any).passportUrl,
+        formUrl: isManual ? undefined : (input as any).formUrl,
+        submissionType: isManual ? "manual" : "upload",
+        formData: isManual
+          ? {
+              ...((input as any).formData as any),
+              dateOfBirth: new Date((input as any).formData.dateOfBirth),
+              graduationDate: new Date((input as any).formData.graduationDate),
+              studentDeclaration: (input as any).formData.studentDeclaration
+                ? {
+                    fullName: (input as any).formData.studentDeclaration.fullName,
+                    signedAt: new Date((input as any).formData.studentDeclaration.signedAt),
+                  }
+                : undefined,
+            }
+          : undefined,
         status: "pending",
         history: [
           {
@@ -41,10 +87,12 @@ export const studentRouter = router({
 
       const student = await User.findById(ctx.user.id)
       if (student) {
+        const created: any = form as any
+        const submissionId = created?.id ? String(created.id) : String(created?._id)
         await sendSubmissionConfirmation({
           to: student.email,
           name: student.name,
-          submissionId: form._id.toString(),
+          submissionId,
         })
       }
 

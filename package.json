@@ -10,6 +10,7 @@
     "create-admin": "node scripts/create-super-admin.js"
   },
   "dependencies": {
+    "@ai-sdk/openai": "^2.0.52",
     "@auth/core": "latest",
     "@hookform/resolvers": "^3.10.0",
     "@radix-ui/react-accordion": "1.2.2",

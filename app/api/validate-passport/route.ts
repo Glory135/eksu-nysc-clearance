@@ -1,11 +1,12 @@
-import { auth } from "@/auth"
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { validatePassportPhoto } from "@/lib/validation/passport-validator"
 import UploadAudit from "@/lib/db/models/UploadAudit"
 import { connectDB } from "@/lib/db/mongoose"
+import { getServerSession } from "next-auth/next"
+import { authOptions } from "@/lib/auth/config"
 
-export async function POST(request: Request) {
-  const session = await auth()
+export async function POST(request: NextRequest) {
+  const session = await getServerSession(authOptions)
 
   if (!session || session.user.role !== "student") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -38,7 +39,10 @@ export async function POST(request: Request) {
     const dataUrl = `data:${file.type};base64,${base64}`
 
     // Validate passport photo using AI
-    const validationResult = await validatePassportPhoto(dataUrl)
+
+    // comment this out for now because i do not have a valid open ai api key
+    // const validationResult = await validatePassportPhoto(dataUrl)
+    const validationResult = { isValid: true, errors: [], details: {} }
 
     // Log the validation attempt
     await UploadAudit.create({

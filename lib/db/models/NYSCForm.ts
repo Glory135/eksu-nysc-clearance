@@ -14,6 +14,24 @@ export interface INYSCForm extends Document {
   studentId: mongoose.Types.ObjectId
   passportUrl: string
   formUrl: string
+  submissionType?: "upload" | "manual"
+  formData?: {
+    name: string
+    faculty: string
+    department: string
+    courseOfStudy: string
+    matricNumber: string
+    jambRegNo: string
+    sex: "male" | "female"
+    dateOfBirth: Date
+    maritalStatus: "single" | "married"
+    stateOfOrigin: string
+    lga: string
+    graduationDate: Date
+    phone: string
+    email: string
+    studentDeclaration?: { fullName: string; signedAt: Date }
+  }
   status: FormStatus
   remarks: string
   history: IFormHistory[]
@@ -40,7 +58,29 @@ const NYSCFormSchema = new Schema<INYSCForm>(
   {
     studentId: { type: Schema.Types.ObjectId, ref: "User", required: true, unique: true },
     passportUrl: { type: String, required: true },
-    formUrl: { type: String, required: true },
+    // Keep optional for backward compatibility when using manual form entry
+    formUrl: { type: String, required: false },
+    submissionType: { type: String, enum: ["upload", "manual"], default: "upload" },
+    formData: {
+      name: { type: String },
+      faculty: { type: String },
+      department: { type: String },
+      courseOfStudy: { type: String },
+      matricNumber: { type: String },
+      jambRegNo: { type: String },
+      sex: { type: String, enum: ["male", "female"] },
+      dateOfBirth: { type: Date },
+      maritalStatus: { type: String, enum: ["single", "married"] },
+      stateOfOrigin: { type: String },
+      lga: { type: String },
+      graduationDate: { type: Date },
+      phone: { type: String },
+      email: { type: String },
+      studentDeclaration: {
+        fullName: { type: String },
+        signedAt: { type: Date },
+      },
+    },
     status: {
       type: String,
       enum: ["pending", "hod_approved", "admissions_approved", "rejected"],

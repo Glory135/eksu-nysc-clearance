@@ -17,6 +17,7 @@ import { toast } from "sonner"
 import { trpc } from "@/lib/trpc/client"
 import { CheckCircle2, XCircle, ExternalLink, Loader2 } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { FormDataDisplay } from "@/components/shared/form-data-display"
 
 interface ReviewSubmissionDialogProps {
   form: any
@@ -125,14 +126,19 @@ export function ReviewSubmissionDialog({ form, open, onOpenChange }: ReviewSubmi
                   View Passport Photo
                 </a>
               </Button>
-              <Button variant="outline" className="justify-start bg-transparent" asChild>
-                <a href={form.formUrl} target="_blank" rel="noopener noreferrer">
-                  <ExternalLink className="mr-2 h-4 w-4" />
-                  View NYSC Form
-                </a>
-              </Button>
+              {form.formUrl && (
+                <Button variant="outline" className="justify-start bg-transparent" asChild>
+                  <a href={form.formUrl} target="_blank" rel="noopener noreferrer">
+                    <ExternalLink className="mr-2 h-4 w-4" />
+                    View NYSC Form (File Upload)
+                  </a>
+                </Button>
+              )}
             </div>
           </div>
+
+          {/* Show structured form data if available */}
+          <FormDataDisplay formData={form.formData} submissionType={form.submissionType} />
 
           {form.remarks && (
             <div className="space-y-2">
