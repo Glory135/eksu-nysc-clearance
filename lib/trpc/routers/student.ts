@@ -48,7 +48,9 @@ export const studentRouter = router({
       // Check if student already has a submission
       const existingForm = await NYSCForm.findOne({ studentId: ctx.user.id })
 
-      if (existingForm) {
+      // If a previous submission exists and it's not rejected, block duplicate submissions.
+      // If it exists and was rejected, allow a resubmission by updating the existing document.
+      if (existingForm && existingForm.status !== "rejected") {
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "You have already submitted your form",
@@ -56,7 +58,9 @@ export const studentRouter = router({
       }
 
       const isManual = (input as any).mode === "manual"
-      const form: INYSCForm = await NYSCForm.create({
+
+      // Build the payload common to create or update
+      const payload: Partial<INYSCForm> = {
         studentId: ctx.user.id,
         passportUrl: (input as any).passportUrl,
         formUrl: isManual ? undefined : (input as any).formUrl,
@@ -75,15 +79,51 @@ export const studentRouter = router({
             }
           : undefined,
         status: "pending",
-        history: [
+      }
+
+      let form: INYSCForm
+
+      if (existingForm && existingForm.status === "rejected") {
+        // Update the existing rejected form to allow resubmission. Clear any generated
+        // compiled artifacts to avoid confusion and append a resubmission history entry.
+        const updated = await NYSCForm.findByIdAndUpdate(
+          existingForm._id,
           {
-            by: ctx.user.id,
-            role: "student",
-            action: "submitted",
-            at: new Date(),
+            $set: payload,
+            $unset: { compiledUrl: "", clearanceId: "", clearanceGeneratedAt: "" },
+            $push: {
+              history: {
+                by: ctx.user.id,
+                role: "student",
+                action: "resubmitted",
+                at: new Date(),
+              },
+            },
           },
-        ],
-      })
+          { new: true },
+        )
+
+        if (!updated) {
+          throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to update existing form" })
+        }
+
+        form = updated as INYSCForm
+      } else {
+        // No existing form (or existing was handled above) — create a new one
+        const created: INYSCForm = await NYSCForm.create({
+          ...(payload as any),
+          history: [
+            {
+              by: ctx.user.id,
+              role: "student",
+              action: "submitted",
+              at: new Date(),
+            },
+          ],
+        })
+
+        form = created
+      }
 
       const student = await User.findById(ctx.user.id)
       if (student) {

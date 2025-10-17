@@ -16,6 +16,7 @@ import { Progress } from "@/components/ui/progress"
 export function UploadForm() {
   const [passportFile, setPassportFile] = useState<File | null>(null)
   const [passportPreview, setPassportPreview] = useState<string | null>(null)
+  const [canEdit, setCanEdit] = useState(true)
   const [isUploading, setIsUploading] = useState(false)
   const [isValidating, setIsValidating] = useState(false)
   const [validationStatus, setValidationStatus] = useState<"idle" | "validating" | "valid" | "invalid">("idle")
@@ -42,6 +43,7 @@ export function UploadForm() {
   })
 
   const { data: profile } = trpc.student.getProfile.useQuery()
+  const { data: myForm } = trpc.student.getMyForm.useQuery()
 
   useEffect(() => {
     if (profile) {
@@ -63,6 +65,50 @@ export function UploadForm() {
       }))
     }
   }, [profile])
+
+  // Prefill form when a previous submission was rejected to allow resubmission
+  useEffect(() => {
+    if (!myForm) return
+
+    if (myForm.status && myForm.status !== "rejected") {
+      // Existing submission in non-rejected state — prevent editing in UI
+      setCanEdit(false)
+      return
+    }
+
+    // If rejected, prefill form fields and passport preview so student can edit/resubmit
+    if (myForm.status === "rejected") {
+      setCanEdit(true)
+
+      if (myForm.formData) {
+        const fd: any = myForm.formData
+        setFormData((prev) => ({
+          ...prev,
+          name: fd.name ?? prev.name,
+          faculty: fd.faculty ?? prev.faculty,
+          department: fd.department ?? prev.department,
+          courseOfStudy: fd.courseOfStudy ?? prev.courseOfStudy,
+          matricNumber: fd.matricNumber ?? prev.matricNumber,
+          jambRegNo: fd.jambRegNo ?? prev.jambRegNo,
+          sex: (fd.sex as any) ?? prev.sex,
+          dateOfBirth: fd.dateOfBirth ? new Date(fd.dateOfBirth).toISOString().slice(0, 10) : prev.dateOfBirth,
+          maritalStatus: (fd.maritalStatus as any) ?? prev.maritalStatus,
+          stateOfOrigin: fd.stateOfOrigin ?? prev.stateOfOrigin,
+          lga: fd.lga ?? prev.lga,
+          graduationDate: fd.graduationDate ? new Date(fd.graduationDate).toISOString().slice(0, 10) : prev.graduationDate,
+          phone: fd.phone ?? prev.phone,
+          email: fd.email ?? prev.email,
+          studentDeclaration: fd.studentDeclaration
+            ? { fullName: fd.studentDeclaration.fullName ?? "", signedAt: fd.studentDeclaration.signedAt ? new Date(fd.studentDeclaration.signedAt).toISOString().slice(0, 10) : "" }
+            : prev.studentDeclaration,
+        }))
+      }
+
+      if (myForm.passportUrl) {
+        setPassportPreview(myForm.passportUrl as any)
+      }
+    }
+  }, [myForm])
 
   const utils = trpc.useUtils()
 
@@ -218,18 +264,33 @@ export function UploadForm() {
       setUploadProgress({ passport: true })
 
       // Submit manual data
+      const typedFormData = {
+        name: formData.name,
+        faculty: formData.faculty,
+        department: formData.department,
+        courseOfStudy: formData.courseOfStudy,
+        matricNumber: formData.matricNumber,
+        jambRegNo: formData.jambRegNo,
+        sex: formData.sex as "male" | "female",
+        dateOfBirth: formData.dateOfBirth,
+        maritalStatus: formData.maritalStatus as "single" | "married",
+        stateOfOrigin: formData.stateOfOrigin,
+        lga: formData.lga,
+        graduationDate: formData.graduationDate,
+        phone: formData.phone,
+        email: formData.email,
+        studentDeclaration: formData.studentDeclaration.fullName
+          ? { fullName: formData.studentDeclaration.fullName, signedAt: formData.studentDeclaration.signedAt || new Date().toISOString() }
+          : undefined,
+      }
+
       const payload = {
         mode: "manual" as const,
         passportUrl,
-        formData: {
-          ...formData,
-          studentDeclaration:
-            formData.studentDeclaration.fullName
-              ? { fullName: formData.studentDeclaration.fullName, signedAt: formData.studentDeclaration.signedAt || new Date().toISOString() }
-              : undefined,
-        },
+        formData: typedFormData,
       }
-      await submitMutation.mutateAsync(payload)
+
+      await submitMutation.mutateAsync(payload as any)
     } catch (error: any) {
       toast.error(error.message || "Failed to upload documents")
     } finally {
@@ -301,6 +362,16 @@ export function UploadForm() {
                 </Alert>
               )}
 
+              {myForm && myForm.status === "rejected" && (
+                <Alert variant="destructive">
+                  <AlertDescription>
+                    <p className="font-medium">Your submission was rejected.</p>
+                    {myForm.remarks && <p className="text-sm mt-1">Reason: {myForm.remarks}</p>}
+                    <p className="text-sm mt-2">Please correct the issues and resubmit your form.</p>
+                  </AlertDescription>
+                </Alert>
+              )}
+
               <div className="flex items-start gap-4">
                 {passportPreview && (
                   <div
@@ -326,7 +397,7 @@ export function UploadForm() {
                     accept="image/jpeg,image/png"
                     onChange={handlePassportChange}
                     className="hidden"
-                    disabled={isUploading || isValidating}
+                    disabled={isUploading || isValidating || !canEdit}
                   />
                   <label htmlFor="passport">
                     <Button
@@ -334,7 +405,7 @@ export function UploadForm() {
                       variant="outline"
                       className="w-full bg-transparent"
                       asChild
-                      disabled={isUploading || isValidating}
+                      disabled={isUploading || isValidating || !canEdit}
                     >
                       <span>
                         {isValidating ? (
@@ -440,7 +511,8 @@ export function UploadForm() {
               disabled={
                 isUploading ||
                 !passportFile ||
-                validationStatus !== "valid"
+                validationStatus !== "valid" ||
+                !canEdit
               }
             >
               {isUploading ? (
@@ -451,7 +523,7 @@ export function UploadForm() {
               ) : (
                 <>
                   <Upload className="mr-2 h-4 w-4" />
-                  Submit for Review
+                  {myForm && myForm.status === "rejected" ? "Resubmit" : "Submit for Review"}
                 </>
               )}
             </Button>
