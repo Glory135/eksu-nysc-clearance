@@ -9,6 +9,7 @@ import { Loader2, AlertTriangle, CheckCircle2, FileText } from "lucide-react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { ReviewSubmissionDialog } from "@/components/hod/review-submission-dialog"
 
 export function AuditLogs() {
   const [selectedAudit, setSelectedAudit] = useState<any>(null)
@@ -53,7 +54,15 @@ export function AuditLogs() {
           <TableBody>
             {auditsList.map((audit: any) => (
               <TableRow key={audit._id}>
-                <TableCell className="font-medium">{audit.studentId?.name || "N/A"}</TableCell>
+                <TableCell className="font-medium">
+                  {audit.studentId?.name || "N/A"}
+                  {audit.studentId?.nyscForm && Array.isArray(audit.studentId.nyscForm.history) &&
+                    audit.studentId.nyscForm.history.some((h: any) => h.action === "resubmitted") && (
+                      <span className="ml-2 inline-block align-middle">
+                        <Badge variant="outline">Resubmitted</Badge>
+                      </span>
+                    )}
+                </TableCell>
                 <TableCell>{audit.studentId?.matricNumber || "N/A"}</TableCell>
                 <TableCell className="max-w-[200px] truncate">{audit.fileName}</TableCell>
                 <TableCell>{(audit.fileSize / 1024).toFixed(2)} KB</TableCell>
@@ -72,10 +81,34 @@ export function AuditLogs() {
                 </TableCell>
                 <TableCell>{new Date(audit.createdAt).toLocaleString()}</TableCell>
                 <TableCell className="text-right">
-                  <Button variant="ghost" size="sm" onClick={() => handleViewDetails(audit)}>
-                    <FileText className="h-4 w-4 mr-1" />
-                    Details
-                  </Button>
+                  <div className="flex justify-end items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      asChild
+                      onClick={() => handleViewDetails(audit)}
+                    >
+                      <a>
+                        <FileText className="h-4 w-4 mr-1" />
+                        Details
+                      </a>
+                    </Button>
+                    {audit.studentId?._id && (
+                      <>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            // open the read-only review dialog with the student's current NYSC form
+                            setSelectedAudit(audit)
+                            setDetailsOpen(true)
+                          }}
+                        >
+                          View Submission
+                        </Button>
+                      </>
+                    )}
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
@@ -172,6 +205,29 @@ export function AuditLogs() {
                   </p>
                 </div>
               </div>
+
+              {selectedAudit.studentId?.nyscForm && (
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Submission</p>
+                  <div className="flex items-center gap-2 mt-2">
+                    {/* Render the read-only ReviewSubmissionDialog for admins by mounting it here */}
+                    <ReviewSubmissionDialog
+                      form={selectedAudit.studentId.nyscForm}
+                      open={Boolean(selectedAudit && detailsOpen)}
+                      onOpenChange={(open: boolean) => {
+                        if (!open) {
+                          setSelectedAudit(null)
+                        }
+                        setDetailsOpen(open)
+                      }}
+                      readOnly
+                    />
+                    {selectedAudit.studentId.nyscForm.history && selectedAudit.studentId.nyscForm.history.some((h: any) => h.action === "resubmitted") && (
+                      <Badge variant="outline">Resubmitted</Badge>
+                    )}
+                  </div>
+                </div>
+              )}
 
               {selectedAudit.rejectionReasons && selectedAudit.rejectionReasons.length > 0 && (
                 <div>

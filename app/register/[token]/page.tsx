@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { trpc } from "@/lib/trpc/client"
 import { useEffect, use } from "react"
 import { toast } from "sonner"
+import { Logo } from "@/components/Logo"
 
 export default function RegisterPage({ params }: { params: Promise<{ token: string }> }) {
   const verifyTokenMutation = trpc.auth.verifyInviteToken.useMutation({
@@ -33,7 +34,7 @@ export default function RegisterPage({ params }: { params: Promise<{ token: stri
           <div className="text-center space-y-2">
             <div className="flex justify-center mb-4">
               <div className="w-20 h-20 bg-primary rounded-full flex items-center justify-center">
-                <span className="text-3xl font-bold text-primary-foreground">EKSU</span>
+                <Logo />
               </div>
             </div>
             <h1 className="text-3xl font-bold text-balance">NYSC Clearance System</h1>

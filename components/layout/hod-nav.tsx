@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button"
 import { signOut } from "next-auth/react"
 import { LayoutDashboard, Upload, LogOut } from "lucide-react"
 
+import { Logo } from "@/components/Logo"
+
 export function HODNav() {
   const pathname = usePathname()
 
@@ -29,9 +31,7 @@ export function HODNav() {
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center gap-8">
             <Link href="/hod/dashboard" className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
-                <span className="text-lg font-bold text-primary-foreground">EKSU</span>
-              </div>
+              <Logo size={36}  wrapperClassName="rounded-full overflow-hidden" />
               <div className="hidden sm:block">
                 <p className="font-semibold text-sm">NYSC Clearance</p>
                 <p className="text-xs text-muted-foreground">HOD Portal</p>

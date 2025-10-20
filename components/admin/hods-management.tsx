@@ -19,6 +19,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Plus, Trash2, UserCheck, Mail } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import { Badge } from "../ui/badge"
 
 export function HODsManagement() {
   const { toast } = useToast()
@@ -90,7 +91,9 @@ export function HODsManagement() {
                 <div className="flex items-center gap-3">
                   <UserCheck className="h-5 w-5 text-muted-foreground" />
                   <div>
-                    <p className="font-medium">{hod.name}</p>
+                    <p className="font-medium flex gap-2 items-center">{hod.name} 
+                      <Badge variant="outline">{hod.accountStatus}</Badge>
+                    </p>
                     <div className="flex items-center gap-1 text-sm text-muted-foreground">
                       <Mail className="h-3 w-3" />
                       {hod.email}

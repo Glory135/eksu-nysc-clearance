@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { Logo } from "@/components/Logo"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { signOut, useSession } from "next-auth/react"
@@ -16,9 +17,7 @@ export function AdmissionsNav() {
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center gap-8">
             <Link href="/admissions/dashboard" className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
-                <span className="text-lg font-bold text-primary-foreground">EKSU</span>
-              </div>
+              <Logo size={36} wrapperClassName="rounded-full overflow-hidden" />
               <div className="hidden sm:block">
                 <p className="font-semibold text-sm">NYSC Clearance</p>
                 <p className="text-xs text-muted-foreground">Admissions Portal</p>

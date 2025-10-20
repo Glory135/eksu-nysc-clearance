@@ -11,7 +11,7 @@ export function SubmissionStatus() {
 
   if (isLoading) {
     return (
-      <Card>
+      <Card className="w-full">
         <CardContent className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </CardContent>
@@ -21,7 +21,7 @@ export function SubmissionStatus() {
 
   if (!form) {
     return (
-      <Card>
+      <Card className="w-full">
         <CardHeader>
           <CardTitle>Submission Status</CardTitle>
           <CardDescription>You have not submitted your documents yet</CardDescription>
@@ -88,7 +88,7 @@ export function SubmissionStatus() {
   const StatusIcon = statusInfo.icon
 
   return (
-    <Card>
+    <Card className="w-full">
       <CardHeader>
         <CardTitle>Submission Status</CardTitle>
         <CardDescription>Submitted on {new Date(form.createdAt).toLocaleDateString()}</CardDescription>

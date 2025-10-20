@@ -11,13 +11,20 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.35 0.15 145); /* EKSU Green #006400 */
+  --primary: oklch(0.4285 0.1512 31.76);
+  /* EKSU red #006400 */
   --primary-foreground: oklch(0.985 0 0);
+
+  --nysc: oklch(0.5441 0.137 145.82);
+  /* NYSC green #006400 */
+  --nysc-foreground: oklch(0.985 0 0);
+
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
   --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.45 0.15 145); /* Lighter green accent */
+  --accent: oklch(33.811% 0.12696 32.33);
+  /* Lighter green accent */
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.985 0 0);
@@ -32,9 +39,11 @@
   --radius: 0.625rem;
   --sidebar: oklch(1 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.35 0.15 145); /* EKSU Green #006400 */
+  --sidebar-primary: oklch(0.35 0.15 145);
+  /* EKSU Green #006400 */
   --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.45 0.15 145); /* Lighter green accent */
+  --sidebar-accent: oklch(0.45 0.15 145);
+  /* Lighter green accent */
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.45 0.15 145);
@@ -47,8 +56,14 @@
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.145 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.45 0.15 145);
+  --primary: oklch(0.4285 0.1512 31.76);
+  /* EKSU red #006400 */
   --primary-foreground: oklch(0.985 0 0);
+
+  --nysc: oklch(0.5441 0.137 145.82);
+  /* NYSC green #006400 */
+  --nysc-foreground: oklch(0.985 0 0);
+
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);
@@ -86,6 +101,8 @@
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-nysc: var(--nysc);
+  --color-nysc-foreground: var(--nysc-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
@@ -120,6 +137,7 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }

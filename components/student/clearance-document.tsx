@@ -35,7 +35,7 @@ export function ClearanceDocument() {
   }
 
   return (
-    <Card className="border-primary/20 bg-primary/5">
+    <Card className="w-full border-primary/20 bg-primary/5">
       <CardHeader>
         <div className="flex items-start justify-between">
           <div className="space-y-1">

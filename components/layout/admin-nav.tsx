@@ -45,6 +45,8 @@ const navItems = [
   },
 ]
 
+import { Logo } from "@/components/Logo"
+
 export function AdminNav() {
   const pathname = usePathname()
 
@@ -52,9 +54,7 @@ export function AdminNav() {
     <nav className="flex items-center justify-between border-b bg-background px-6 py-4">
       <div className="flex items-center gap-8 w-full">
         <Link href="/admin/dashboard" className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center">
-            <span className="text-primary-foreground font-bold text-sm">E</span>
-          </div>
+          <Logo size={36}  wrapperClassName="rounded-full overflow-hidden" />
           <div className="flex flex-col">
             <span className="font-semibold text-sm leading-none">EKSU NYSC</span>
             <span className="text-xs text-muted-foreground">Admin Portal</span>

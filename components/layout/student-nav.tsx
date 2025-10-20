@@ -1,59 +1,88 @@
-"use client"
+'use client';
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { signOut, useSession } from "next-auth/react"
-import { LayoutDashboard, LogOut, User } from "lucide-react"
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { signOut, useSession } from 'next-auth/react';
+import { LayoutDashboard, LogOut, User } from 'lucide-react';
+import { Logo } from '@/components/Logo';
 
 export function StudentNav() {
-  const pathname = usePathname()
-  const { data: session } = useSession()
+	const pathname = usePathname();
+	const { data: session } = useSession();
 
-  return (
-    <nav className="border-b bg-card">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          <div className="flex items-center gap-8">
-            <Link href="/student/dashboard" className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
-                <span className="text-lg font-bold text-primary-foreground">EKSU</span>
-              </div>
-              <div className="hidden sm:block">
-                <p className="font-semibold text-sm">NYSC Clearance</p>
-                <p className="text-xs text-muted-foreground">Student Portal</p>
-              </div>
-            </Link>
+	return (
+		<nav className='border-b bg-card'>
+			<div className='container mx-auto px-4'>
+				<div className='flex items-center justify-between h-16'>
+					<div className='flex items-center gap-8'>
+						<Link
+							href='/student/dashboard'
+							className='flex items-center gap-2'>
+							<Logo size={40} wrapperClassName="rounded-full overflow-hidden bg-primary flex items-center justify-center" />
+							<div className='hidden sm:block'>
+								<p className='font-semibold text-sm'>
+									NYSC Clearance
+								</p>
+								<p className='text-xs text-muted-foreground'>
+									Student Portal
+								</p>
+							</div>
+						</Link>
 
-            <Link href="/student/dashboard">
-              <Button variant={pathname === "/student/dashboard" ? "default" : "ghost"} size="sm" className="gap-2">
-                <LayoutDashboard className="h-4 w-4" />
-                <span className="hidden sm:inline">Dashboard</span>
-              </Button>
-            </Link>
+						<Link href='/student/dashboard'>
+							<Button
+								variant={
+									pathname === '/student/dashboard'
+										? 'default'
+										: 'ghost'
+								}
+								size='sm'
+								className='gap-2'>
+								<LayoutDashboard className='h-4 w-4' />
+								<span className='hidden sm:inline'>
+									Dashboard
+								</span>
+							</Button>
+						</Link>
 
-            <Link href="/student/profile">
-              <Button variant={pathname === "/student/profile" ? "default" : "ghost"} size="sm" className="gap-2">
-                <User className="h-4 w-4" />
-                <span className="hidden sm:inline">Profile</span>
-              </Button>
-            </Link>
-          </div>
+						<Link href='/student/profile'>
+							<Button
+								variant={
+									pathname === '/student/profile'
+										? 'default'
+										: 'ghost'
+								}
+								size='sm'
+								className='gap-2'>
+								<User className='h-4 w-4' />
+								<span className='hidden sm:inline'>
+									Profile
+								</span>
+							</Button>
+						</Link>
+					</div>
 
-          <div className="flex items-center gap-2">
-            {session?.user && (
-              <div className="hidden md:flex items-center gap-2 mr-4">
-                <User className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">{session.user.name}</span>
-              </div>
-            )}
-            <Button variant="ghost" size="sm" onClick={() => signOut({ callbackUrl: "/login" })} className="gap-2">
-              <LogOut className="h-4 w-4" />
-              <span className="hidden sm:inline">Logout</span>
-            </Button>
-          </div>
-        </div>
-      </div>
-    </nav>
-  )
+					<div className='flex items-center gap-2'>
+						{session?.user && (
+							<div className='hidden md:flex items-center gap-2 mr-4'>
+								<User className='h-4 w-4 text-muted-foreground' />
+								<span className='text-sm text-muted-foreground'>
+									{session.user.name}
+								</span>
+							</div>
+						)}
+						<Button
+							variant='ghost'
+							size='sm'
+							onClick={() => signOut({ callbackUrl: '/login' })}
+							className='gap-2'>
+							<LogOut className='h-4 w-4' />
+							<span className='hidden sm:inline'>Logout</span>
+						</Button>
+					</div>
+				</div>
+			</div>
+		</nav>
+	);
 }

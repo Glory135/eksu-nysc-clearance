@@ -2,7 +2,7 @@ import { ProfileForm } from "@/components/student/profile-form"
 
 export default function StudentProfilePage() {
   return (
-    <div className="container mx-auto py-8 px-4 max-w-4xl">
+    <div className="container mx-auto py-8 max-w-4xl">
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold text-balance">My Profile</h1>

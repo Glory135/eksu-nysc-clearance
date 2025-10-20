@@ -97,12 +97,11 @@ It replaces the manual process of printing and physical verification by automati
 ## 7. Clearance Workflow
 
 ### Student Upload
-1. Student provides the following information:
-  - Passport photo (validated)
-  - NYSC Mobilization Form fields (structured/manual entry) — canonical flow
-  - Optional: NYSC Mobilization Form (PDF or image) — retained for backward compatibility and legacy records
-2. Data and/or files are stored securely.
-3. Form record created with status = `pending`. The record includes a `submissionType` field indicating whether the submission was provided as `manual` (structured fields) or `upload` (file-based), and when `manual` a `formData` object contains the structured values.
+1. Student uploads:
+   - Passport photo (validated)
+   - NYSC Mobilization Form (PDF or image)
+2. Files stored securely.
+3. Form record created with status = `pending`.
 4. Email confirmation sent to student.
 
 ### HOD Review
