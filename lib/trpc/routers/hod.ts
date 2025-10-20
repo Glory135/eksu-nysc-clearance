@@ -11,11 +11,14 @@ export const hodRouter = router({
   uploadStudents: hodProcedure
     .input(
       z.object({
+        // Allow batch-level graduationYear or per-student graduationYear
+        graduationYear: z.number().int().min(2000).max(new Date().getFullYear()).optional(),
         students: z.array(
           z.object({
             name: z.string(),
             email: z.string().email(),
             matricNumber: z.string(),
+            graduationYear: z.number().int().min(2000).max(new Date().getFullYear()).optional(),
           }),
         ),
       }),
@@ -51,10 +54,26 @@ export const hodRouter = router({
           const inviteToken = crypto.randomBytes(32).toString("hex")
           const inviteTokenExpiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
 
+          // Determine graduation year: per-student overrides batch-level
+          const gradYear = student.graduationYear || input.graduationYear
+
+          // Validate gradYear if provided
+          if (!gradYear) {
+            errors.push({ student, error: "Missing graduationYear" })
+            continue
+          }
+
+          const currentYear = new Date().getFullYear()
+          if (gradYear < 2000 || gradYear > currentYear) {
+            errors.push({ student, error: "Invalid graduationYear" })
+            continue
+          }
+
           const newUser = await User.create({
             name: student.name,
             email: student.email,
             matricNumber: student.matricNumber,
+            graduationYear: gradYear,
             role: "student",
             department: hodDepartment,
             accountStatus: "invited",

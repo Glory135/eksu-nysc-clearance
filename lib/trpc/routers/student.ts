@@ -63,6 +63,8 @@ export const studentRouter = router({
       const payload: Partial<INYSCForm> = {
         studentId: ctx.user.id,
         passportUrl: (input as any).passportUrl,
+        // Persist graduationYear on the form when available from user profile
+        graduationYear: (ctx.user as any).graduationYear ? Number((ctx.user as any).graduationYear) : undefined,
         formUrl: isManual ? undefined : (input as any).formUrl,
         submissionType: isManual ? "manual" : "upload",
         formData: isManual

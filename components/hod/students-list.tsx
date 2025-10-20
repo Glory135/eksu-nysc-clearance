@@ -7,9 +7,11 @@ import { Badge } from "@/components/ui/badge"
 import { Mail, Loader2 } from "lucide-react"
 import { toast } from "sonner"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { useState } from "react"
 
 export function StudentsList() {
   const { data: students, isLoading } = trpc.hod.getDepartmentStudents.useQuery()
+  const [filterYear, setFilterYear] = useState<number | "all">("all")
   const utils = trpc.useUtils()
 
   const resendInviteMutation = trpc.hod.resendInvite.useMutation({
@@ -55,6 +57,21 @@ export function StudentsList() {
       <CardHeader>
         <CardTitle>Department Students</CardTitle>
         <CardDescription>Manage students in your department ({students?.length || 0} total)</CardDescription>
+        <div className="mt-2">
+          <label className="text-sm mr-2">Graduation Year:</label>
+          <select value={filterYear as any} onChange={(e) => setFilterYear(e.target.value === "all" ? "all" : Number(e.target.value))} className="ml-2 rounded-md border px-2 py-1">
+            <option value="all">All</option>
+            {/* Show recent years up to current */}
+            {Array.from({ length: 6 }).map((_, idx) => {
+              const year = new Date().getFullYear() - idx
+              return (
+                <option key={year} value={year}>
+                  {year}
+                </option>
+              )
+            })}
+          </select>
+        </div>
       </CardHeader>
       <CardContent>
         {!students || students.length === 0 ? (
@@ -68,16 +85,20 @@ export function StudentsList() {
                 <TableRow>
                   <TableHead>Name</TableHead>
                   <TableHead>Email</TableHead>
+                  <TableHead>Graduation Year</TableHead>
                   <TableHead>Matric Number</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {students.map((student) => (
+                {students
+                  .filter((s) => (filterYear === "all" ? true : s.graduationYear === filterYear))
+                  .map((student) => (
                   <TableRow key={student._id.toString()}>
                     <TableCell className="font-medium">{student.name}</TableCell>
                     <TableCell>{student.email}</TableCell>
+                    <TableCell>{student.graduationYear || "N/A"}</TableCell>
                     <TableCell>{student.matricNumber}</TableCell>
                     <TableCell>{getStatusBadge(student.accountStatus)}</TableCell>
                     <TableCell className="text-right">

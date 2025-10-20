@@ -71,9 +71,10 @@ export const admissionsRouter = router({
             const hodUser = await User.findById(hodApproval?.by)
 
             // Generate clearance ID
-            const year = new Date().getFullYear()
+            // Prefer graduationYear from the form (if manual) or from the student profile
+            const preferredYear = (form as any).graduationYear || fullStudent?.graduationYear || new Date().getFullYear()
             const randomId = Math.random().toString(36).substring(2, 8).toUpperCase()
-            const clearanceId = `EKSU-NYSC-${year}-${randomId}`
+            const clearanceId = `EKSU-NYSC-${preferredYear}-${randomId}`
 
             // Prefer structured form data when available (manual submissions)
             const manual = (form as any).submissionType === "manual" && (form as any).formData
@@ -104,6 +105,8 @@ export const admissionsRouter = router({
                 name: department?.name || "N/A",
                 faculty: department?.faculty,
               },
+              // include graduationYear for clarity in the PDF
+              graduationDate: (form as any).graduationYear || fullStudent?.graduationYear,
               passportUrl: form.passportUrl,
               hod: {
                 name: hodUser?.name as string,

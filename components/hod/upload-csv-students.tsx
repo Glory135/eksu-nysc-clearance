@@ -12,6 +12,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 export function UploadCSVStudents() {
   const [file, setFile] = useState<File | null>(null)
+  const [graduationYear, setGraduationYear] = useState<number | "">(new Date().getFullYear())
   const [uploadResults, setUploadResults] = useState<{
     created: number
     errors: Array<{ student: any; error: string }>
@@ -64,6 +65,8 @@ export function UploadCSVStudents() {
           name: values[headers.indexOf("name")] || values[0],
           email: values[headers.indexOf("email")] || values[1],
           matricNumber: values[headers.indexOf("matricnumber")] || values[2],
+          // Optional per-row graduationYear column
+          graduationYear: headers.includes("graduationyear") ? Number(values[headers.indexOf("graduationyear")]) || undefined : undefined,
         }
         students.push(student)
       }
@@ -86,14 +89,14 @@ export function UploadCSVStudents() {
         return
       }
 
-      uploadMutation.mutate({ students })
+      uploadMutation.mutate({ students, graduationYear: graduationYear === "" ? undefined : Number(graduationYear) })
     } catch (error) {
       toast.error("Failed to parse CSV file")
     }
   }
 
   const downloadTemplate = () => {
-    const csv = "name,email,matricNumber\nJohn Doe,john.doe@eksu.edu.ng,EKSU/2020/12345"
+    const csv = "name,email,matricNumber,graduationYear\nJohn Doe,john.doe@eksu.edu.ng,EKSU/2020/12345,2024"
     const blob = new Blob([csv], { type: "text/csv" })
     const url = window.URL.createObjectURL(blob)
     const a = document.createElement("a")
@@ -113,8 +116,22 @@ export function UploadCSVStudents() {
         <Alert>
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>CSV Format</AlertTitle>
-          <AlertDescription>Your CSV file should have three columns: name, email, matricNumber</AlertDescription>
+          <AlertDescription>Your CSV file should have columns: name, email, matricNumber, graduationYear</AlertDescription>
         </Alert>
+
+        <div className="grid grid-cols-2 gap-2">
+          <label className="flex flex-col">
+            <span className="text-sm mb-1">Graduation Year (batch)</span>
+            <input
+              type="number"
+              min={2000}
+              max={new Date().getFullYear()}
+              value={graduationYear as any}
+              onChange={(e) => setGraduationYear(e.target.value === "" ? "" : Number(e.target.value))}
+              className="mt-1 w-full rounded-md border px-3 py-2"
+            />
+          </label>
+        </div>
 
         <Button variant="outline" onClick={downloadTemplate} className="w-full bg-transparent">
           <Download className="mr-2 h-4 w-4" />

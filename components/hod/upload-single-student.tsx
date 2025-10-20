@@ -15,6 +15,7 @@ export function UploadSingleStudent() {
     name: "",
     email: "",
     matricNumber: "",
+    graduationYear: new Date().getFullYear(),
   })
 
   const utils = trpc.useUtils()
@@ -36,7 +37,7 @@ export function UploadSingleStudent() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    uploadMutation.mutate({ students: [formData] })
+    uploadMutation.mutate({ students: [{ name: formData.name, email: formData.email, matricNumber: formData.matricNumber, graduationYear: formData.graduationYear }] })
   }
 
   return (
@@ -77,6 +78,19 @@ export function UploadSingleStudent() {
               placeholder="EKSU/2020/12345"
               value={formData.matricNumber}
               onChange={(e) => setFormData({ ...formData, matricNumber: e.target.value })}
+              required
+              disabled={uploadMutation.isPending}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="graduationYear">Graduation Year</Label>
+            <Input
+              id="graduationYear"
+              type="number"
+              min={2000}
+              max={new Date().getFullYear()}
+              value={formData.graduationYear}
+              onChange={(e) => setFormData({ ...formData, graduationYear: Number(e.target.value) })}
               required
               disabled={uploadMutation.isPending}
             />

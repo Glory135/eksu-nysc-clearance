@@ -64,6 +64,7 @@ export const authOptions: NextAuthOptions = {
             name: user.name,
             role: user.role,
             department: user.department?._id?.toString() || null,
+            graduationYear: user.graduationYear,
             accountStatus: user.accountStatus,
           }
         } catch (error) {
@@ -78,6 +79,7 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.role = user.role
         token.department = user.department
+        token.graduationYear = user.graduationYear
         token.accountStatus = user.accountStatus
       }
       return token
@@ -88,6 +90,7 @@ export const authOptions: NextAuthOptions = {
         session.user.role = token.role as string
         session.user.department = token.department as string
         session.user.accountStatus = token.accountStatus as string
+        session.user.graduationYear = token.graduationYear as number | undefined
       }
       return session
     },

@@ -8,6 +8,7 @@ export interface IUser extends Document {
   email: string
   matricNumber: string
   password: string | null
+  graduationYear?: number
   role: UserRole
   department: mongoose.Types.ObjectId
   accountStatus: AccountStatus
@@ -32,6 +33,8 @@ const UserSchema = new Schema<IUser>(
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true, lowercase: true },
     matricNumber: { type: String, required: true, unique: true },
+  // Graduation year grouping (e.g., 2024)
+  graduationYear: { type: Number, min: 2000 },
     password: { type: String, default: null },
     role: {
       type: String,

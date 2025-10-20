@@ -13,6 +13,7 @@ export interface IFormHistory {
 export interface INYSCForm extends Document {
   studentId: mongoose.Types.ObjectId
   passportUrl: string
+  graduationYear?: number
   formUrl: string
   submissionType?: "upload" | "manual"
   formData?: {
@@ -58,6 +59,8 @@ const NYSCFormSchema = new Schema<INYSCForm>(
   {
     studentId: { type: Schema.Types.ObjectId, ref: "User", required: true, unique: true },
     passportUrl: { type: String, required: true },
+  // Graduation year (e.g., 2024) used to group forms/students
+  graduationYear: { type: Number, required: false, min: 2000 },
     // Keep optional for backward compatibility when using manual form entry
     formUrl: { type: String, required: false },
     submissionType: { type: String, enum: ["upload", "manual"], default: "upload" },
@@ -99,6 +102,7 @@ const NYSCFormSchema = new Schema<INYSCForm>(
 // Index for studentId is automatically created by unique: true
 NYSCFormSchema.index({ status: 1 })
 NYSCFormSchema.index({ clearanceId: 1 })
+NYSCFormSchema.index({ graduationYear: 1 })
 
 const NYSCForm: Model<INYSCForm> = mongoose.models.NYSCForm || mongoose.model<INYSCForm>("NYSCForm", NYSCFormSchema)
 
