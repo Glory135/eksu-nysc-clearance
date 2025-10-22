@@ -41,8 +41,8 @@ export async function POST(request: NextRequest) {
     // Validate passport photo using AI
 
     // comment this out for now because i do not have a valid open ai api key
-    // const validationResult = await validatePassportPhoto(dataUrl)
-    const validationResult = { isValid: true, errors: [], details: {} }
+    const validationResult = await validatePassportPhoto(dataUrl)
+    // const validationResult = { isValid: true, errors: [], details: {} }
 
     // Log the validation attempt
     await UploadAudit.create({

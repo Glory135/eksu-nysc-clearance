@@ -1,5 +1,6 @@
 import { generateText } from "ai"
 import { openai } from "@ai-sdk/openai"
+import { google } from '@ai-sdk/google';
 
 export interface PassportValidationResult {
   isValid: boolean
@@ -30,7 +31,7 @@ export async function validatePassportPhoto(imageUrl: string): Promise<PassportV
 Be strict with validation. The photo must meet professional passport standards.`
 
     const { text } = await generateText({
-      model: openai("gpt-4o"),
+      model: google("gemini-2.5-flash"),
       messages: [
         {
           role: "user",
